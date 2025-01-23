@@ -23,7 +23,7 @@ const DEFAULT_SETTINGS = {
 function App() {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [prompt, setPrompt] = useState('')
-  const [think, setThink] = useState(false)
+  const [reason, setReason] = useState(false)
   const [conversation, setConversation] = useState<IMessage[]>([])
   const [processing, setProcessing] = useState(false)
 
@@ -34,7 +34,7 @@ function App() {
         if (conversation && conversation.length == 0) {
           setConversation(() => [{
             role: 'system',
-            reason: think,
+            reason: reason,
             content: settings.system_prompt
           }])
           return
@@ -42,7 +42,7 @@ function App() {
         if (conversation && conversation.length > 0 && conversation[0].role !== 'system') {
           setConversation(() => [{
             role: 'system',
-            reason: think,
+            reason: reason,
             content: settings.system_prompt
           }, ...conversation])
         }
@@ -62,7 +62,7 @@ function App() {
         let conv = [...conversation]
         conv.push({
           role: 'user',
-          reason: think,
+          reason: reason,
           content: prompt
         })
         setConversation(conv)
@@ -87,7 +87,7 @@ function App() {
         const answer = data.choices[0].message.content
         conv.push({
           role: 'assistant',
-          reason: think,
+          reason: reason,
           content: answer
         })
 
@@ -189,8 +189,8 @@ function App() {
                 onClick={send}
                 disabled={processing}
               ><IoSend /></button>
-              <button className={'p-2 ' + (think ? 'bg-green-600' : 'bg-slate-600')}
-                onClick={() => setThink(!think)}
+              <button className={'p-2 ' + (reason ? 'bg-green-600' : 'bg-slate-600')}
+                onClick={() => setReason(!reason)}
                 disabled={processing}
               ><FaBrain /></button>
               <button className='bg-red-600 p-2'
