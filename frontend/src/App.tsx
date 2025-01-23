@@ -5,9 +5,6 @@ import { IoSend } from 'react-icons/io5'
 import { TiDeleteOutline } from 'react-icons/ti'
 import ReactMarkdown from 'react-markdown'
 import { PuffLoader } from 'react-spinners'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-// import './App.css'
 
 interface IMessage {
   role: 'user' | 'assistant' | 'system'
@@ -16,8 +13,6 @@ interface IMessage {
 }
 
 const ENDPOINT = 'http://localhost:11434/v1/chat/completions'
-//const CHAT_MODEL = 'deepseek-r1:8b'
-//const API_KEY = 'ollama'
 const DEFAULT_SETTINGS = {
   chat_model: 'deepseek-r1:8b',
   max_tokens: '0',
@@ -26,28 +21,10 @@ const DEFAULT_SETTINGS = {
 }
 
 function App() {
-  //const [count, setCount] = useState(0)
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [prompt, setPrompt] = useState('')
-  //const [conversations, setConversations] = useState([])
   const [think, setThink] = useState(false)
-  const [conversation, setConversation] = useState<IMessage[]>([
-    {
-      role: 'assistant',
-      reason: false,
-      content: "Hello, I'm your friendly AI assistant. How can I help you today?"
-    },
-    {
-      role: 'user',
-      reason: false,
-      content: 'What is the speed of light?'
-    },
-    {
-      role: 'assistant',
-      reason: false,
-      content: '299,792,458 m/s'
-    }
-  ])
+  const [conversation, setConversation] = useState<IMessage[]>([])
   const [processing, setProcessing] = useState(false)
 
   const addSystemPromptOnce = () => {
@@ -81,31 +58,13 @@ function App() {
   const send = async () => {
     if (!processing && prompt.length > 0) {
       try {
-        //addSystemPromptOnce()
+        addSystemPromptOnce()
         let conv = [...conversation]
-        // if (settings.system_prompt.length > 0) {
-        //   conv.push({
-        //     role: 'system',
-        //     reason: think,
-        //     content: prompt
-        //   })
-        // }
         conv.push({
           role: 'user',
           reason: think,
           content: prompt
         })
-        // conv.push({
-        //   role: 'user',
-        //   content: prompt
-        // })
-        // setConversation([
-        //   ...conversation,
-        //   {
-        //     role: 'user',
-        //     content: prompt
-        //   }
-        // ])
         setConversation(conv)
         setProcessing(true)
 
