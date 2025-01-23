@@ -1,0 +1,14 @@
+POST http://localhost:11434/v1/chat/completions
+api-key: ollama
+Content-Type: application/json
+
+{
+    "messages":[
+        {
+            "role":"user",
+            "content":"What is the speed of light?"
+        }
+    ],
+    "model":"deepseek-r1:8b",
+    "max_tokens":50
+}
