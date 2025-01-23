@@ -10,14 +10,14 @@ import { PuffLoader } from 'react-spinners'
 // import './App.css'
 
 interface IMessage {
-  role: 'user' | 'assistant'
+  role: 'user' | 'assistant' | 'system'
   reason: boolean
   content: string
 }
 
 const ENDPOINT = 'http://localhost:11434/v1/chat/completions'
-const CHAT_MODEL = 'deepseek-r1:8b'
-const API_KEY = 'ollama'
+//const CHAT_MODEL = 'deepseek-r1:8b'
+//const API_KEY = 'ollama'
 const DEFAULT_SETTINGS = {
   chat_model: 'deepseek-r1:8b',
   max_tokens: '0',
@@ -29,7 +29,7 @@ function App() {
   //const [count, setCount] = useState(0)
   const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const [prompt, setPrompt] = useState('')
-  const [conversations, setConversations] = useState([])
+  //const [conversations, setConversations] = useState([])
   const [think, setThink] = useState(false)
   const [conversation, setConversation] = useState<IMessage[]>([
     {
@@ -50,10 +50,46 @@ function App() {
   ])
   const [processing, setProcessing] = useState(false)
 
+  const addSystemPromptOnce = () => {
+    try {
+
+      if (settings.system_prompt.length > 0) {
+        if (conversation && conversation.length == 0) {
+          setConversation(() => [{
+            role: 'system',
+            reason: think,
+            content: settings.system_prompt
+          }])
+          return
+        }
+        if (conversation && conversation.length > 0 && conversation[0].role !== 'system') {
+          setConversation(() => [{
+            role: 'system',
+            reason: think,
+            content: settings.system_prompt
+          }, ...conversation])
+        }
+        console.info(JSON.stringify(conversation, null, 2))
+      }
+    } catch (error) {
+      console.error(error)
+    }
+
+  }
+
+
   const send = async () => {
     if (!processing && prompt.length > 0) {
       try {
+        //addSystemPromptOnce()
         let conv = [...conversation]
+        // if (settings.system_prompt.length > 0) {
+        //   conv.push({
+        //     role: 'system',
+        //     reason: think,
+        //     content: prompt
+        //   })
+        // }
         conv.push({
           role: 'user',
           reason: think,
@@ -109,23 +145,27 @@ function App() {
   }
 
   const clear = () => {
-    setConversation([])
     setPrompt('')
+    setConversation(() => [])
+    addSystemPromptOnce()
   }
 
-
-  const extractThink = (data: string): { think: string, rest: string } => {
+  const extractThink = (data: string): { think: string, content: string } => {
     if (data) {
       // data = '<think>This is a test</think> The answer is 42'
-      const start = data.indexOf('<think>')
-      const end = data.indexOf('</think>')
-      if (start > -1 && end > -1) {
-        const think = "Reasoning\n\n" + data.substring(start + 7, end)
-        const rest = data.substring(end + 8)
-        return { think, rest }
+      try {
+        const start = data.indexOf('<think>')
+        const end = data.indexOf('</think>')
+        if (start > -1 && end > -1) {
+          const think = "Reasoning\n\n" + data.substring(start + 7, end)
+          const content = data.substring(end + 8)
+          return { think, content: content }
+        }
+      } catch (error) {
+        console.error(error)
       }
     }
-    return { think: '', rest: data }
+    return { think: '', content: data }
   }
 
   return (
@@ -171,7 +211,7 @@ function App() {
                   }
 
                   {/* {processing && <label>Processing...</label>} */}
-                  <ReactMarkdown>{extractThink(message.content).rest}</ReactMarkdown>
+                  <ReactMarkdown>{extractThink(message.content).content}</ReactMarkdown>
 
                 </div>
               </div>
@@ -202,7 +242,16 @@ function App() {
           </div>
         </main>
       </div>
-      <footer className='bg-slate-900 h-[35px] flex items-center text-white'>Footer</footer>
+      <footer className='bg-slate-900 h-[35px] flex items-center text-white'>
+        {processing &&
+          <>
+            <PuffLoader color='white' size={25}
+            />
+            <label> Processing...</label>
+          </>
+
+        }
+      </footer>
     </>
   )
 }
