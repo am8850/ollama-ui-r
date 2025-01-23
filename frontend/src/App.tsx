@@ -167,7 +167,7 @@ function App() {
               <div key={idx} className={'flex gap-2 mt-2 ' + (message.role === 'user' ? 'justify-end' : '')}>
                 <div className={'rounded-md p-2 ' + (message.role === 'user' ? 'bg-blue-600' : 'bg-slate-600')}>
                   {message.reason && message.role === 'assistant' &&
-                    <ReactMarkdown className="bg-green-200 text-black p-2 rounded-md">{extractThink(message.content).think}</ReactMarkdown>
+                    <ReactMarkdown className="bg-slate-300 text-black p-2 rounded-md">{extractThink(message.content).think}</ReactMarkdown>
                   }
 
                   {/* {processing && <label>Processing...</label>} */}
